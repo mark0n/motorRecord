@@ -1,0 +1,8 @@
+O.linux-x86_64
+O.linux-x86_64-debug
+O.Common
+bin/
+dbd/
+db/
+include/
+lib/
