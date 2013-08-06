@@ -946,7 +946,7 @@ static void CloseSocket(int SocketIndex)
     int status;
 
     if ((SocketIndex < 0) || (SocketIndex >= nextSocket)) {
-        printf("drvPMNC CloseSocket: invalid SocketIndex %d\n", SocketIndex);
+        printf("drvPC6K CloseSocket: invalid SocketIndex %d\n", SocketIndex);
         return;
     }
     psock = &socketStructs[SocketIndex];
@@ -954,7 +954,7 @@ static void CloseSocket(int SocketIndex)
     status = pasynCommonSyncIO->disconnectDevice(pasynUser);
     if (status != asynSuccess ) {
         asynPrint(pasynUser, ASYN_TRACE_ERROR,
-                  "drvPMNC CloseSocket: error calling pasynCommonSyncIO->disconnect, status=%d, %s\n",
+                  "drvPC6K CloseSocket: error calling pasynCommonSyncIO->disconnect, status=%d, %s\n",
                   status, pasynUser->errorMessage);
         return;
     } else
