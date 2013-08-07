@@ -56,8 +56,8 @@ Last Modified:	$Date: 2006-08-31 15:42:31 $
 // #define PC6K_IN_EOS    "\n"  /* Reply */
 #define PC6K_IN_EOS    ">"  /* Reply */
 
-#define PC6K_QUERY_CNT 5
-enum PC6K_query_types {QSTATUS, QPOS, QEA_POS, QVEL, QDRIVE};
+#define PC6K_QUERY_CNT 6
+enum PC6K_query_types {QSTATUS, QLIM, QPOS, QEA_POS, QVEL, QDRIVE};
 
 
 enum PC6K_model
@@ -119,6 +119,10 @@ struct PC6KController
 #define TAS_SMINUSTL   17+4    /* Software Minus Travel Limit */
 #define TAS_POSERROR   22+5    /* Position Error */
 #define TAS_INTARGET   23+5    /* In Target Zone */
+
+#define TLIM_POS_LSW   0       /* Positive Limit Switch */
+#define TLIM_NEG_LSW   1       /* Negative Limit Switch */
+#define TLIM_HOME_SW   2       /* Home switch */
 
 
 #endif	/* INCdrvPC6Kh */

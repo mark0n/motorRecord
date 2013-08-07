@@ -56,6 +56,7 @@ HeadURL:        $URL: https://subversion.xor.aps.anl.gov/synApps/motor/tags/R6-8
 #include "epicsExit.h"
 
 #define CMD_STATUS      "TAS"
+#define CMD_LIM         "TLIM"
 #define CMD_POS         "TPC"
 #define CMD_EA_POS      "TPE"
 #define CMD_VEL         "TVELA"
@@ -120,7 +121,7 @@ volatile double drvPC6KReadbackDelay = 0.;
 static struct {
   const char *cmnd;
   int  cmndLen;
-} queryOps[]= {{CMD_STATUS, 0}, {CMD_POS, 0}, {CMD_EA_POS, 0}, {CMD_VEL, 0}, {CMD_DRIVE, 0}};
+} queryOps[]= {{CMD_STATUS, 0}, {CMD_LIM, 0}, {CMD_POS, 0}, {CMD_EA_POS, 0}, {CMD_VEL, 0}, {CMD_DRIVE, 0}};
 
 #define QUERY_CNT PC6K_QUERY_CNT
 
@@ -270,6 +271,7 @@ static int set_status(int card, int signal)
   char send_buff[80];
   char *strstrRtn[QUERY_CNT];
   char *recvStr;
+  bool posLimit, negLimit, home;
   double vel;
   int rtn_state;
   int recvCnt;
@@ -299,7 +301,8 @@ static int set_status(int card, int signal)
 	  (cntrl->recv_string[qindex][0] == REPLY_CHAR))
 	{
 	  // Index into return string (add 1 to command length to account for REPLY_CHAR)
-	  strstrRtn[qindex] = &cntrl->recv_string[qindex][strlen(send_buff)+1];
+	  int corr = (qindex == QLIM) ? -1 : 0; // correct for missing address specifier in TLIM response (bug in controller firmware?)
+	  strstrRtn[qindex] = &cntrl->recv_string[qindex][strlen(send_buff)+1+corr];
         recvRetry = false;
 	recvNext = (++qindex >= QUERY_CNT) ? false : true;
 	}
@@ -346,23 +349,28 @@ static int set_status(int card, int signal)
     nodeptr = motor_info->motor_motion;
 
     /* 
-     * Parse the status/fault string
+     * Parse the limit/status/fault strings
      */
+    recvStr = strstrRtn[QLIM];
+    Debug(5, "set_status(): limits  = %s\n", recvStr);
+
+    posLimit = (recvStr[TLIM_POS_LSW] == '0') ? 1 : 0;
+    negLimit = (recvStr[TLIM_NEG_LSW] == '0') ? 1 : 0;
+    home = (recvStr[TLIM_HOME_SW] == '1');
+
     recvStr = strstrRtn[QSTATUS];
 
     Debug(5, "set_status(): status  = %s\n", recvStr);
 
     status.Bits.RA_DIRECTION = (recvStr[TAS_NEG] == '0') ? 1 : 0;
 
-    status.Bits.RA_HOME = (recvStr[TAS_HOME] == '1') ? 1 : 0;
+    status.Bits.RA_HOME = home;
 
     plusdir = (status.Bits.RA_DIRECTION) ? true : false;
 
     status.Bits.RA_DONE = (recvStr[TAS_INMOTION] == '0') ? 1 : 0;
 
-    /* Set Travel limit switch status bits. */
-    if ((recvStr[TAS_HPLUSTL] == '0' && recvStr[TAS_SPLUSTL] == '0') ||  
-	status.Bits.RA_HOME)
+    if (!posLimit)
       status.Bits.RA_PLUS_LS = 0;
     else
       {
@@ -371,8 +379,7 @@ static int set_status(int card, int signal)
 	  ls_active = true;
       }
     
-    if ((recvStr[TAS_HMINUSTL] == '0' && recvStr[TAS_SMINUSTL] == '0') ||  
-	status.Bits.RA_HOME)
+    if (!negLimit)
       status.Bits.RA_MINUS_LS = 0;
     else
       {
