@@ -51,7 +51,7 @@
     They implement standard EPICS asyn interfaces, and can in principle be used with
     any EPICS records, and do not require the motor record. However, the motor record
     currently provides the only "state machine" logic that keeps track of backlash,
-    enforcing soft limits, etc. Model 2 and 3 drivers to permit access to controller-specific
+    enforcing soft limits, etc. Model 2 and 3 drivers permit access to controller-specific
     features that the motor record does not support, and this is typicaly implemented
     using standard EPICS records (ao, ai, bo, bi, etc.)</p>
   <h2 id="Model1" style="text-align: left">
@@ -131,7 +131,7 @@
   </ul>
   <p>
     The Model 3 C++ API is based on the concept of two types of objects: a motor controller
-    and one or motor motor axes. The controller object supports the functions that apply
+    and one or more motor axes. The controller object supports the functions that apply
     to the entire controller. The controller supports one or more axes. The axis objects
     support the functions for a specific axis. These objects are implemented in the
     device-dependent driver. There is a base class for each of these objects, asynMotorControlller
@@ -140,7 +140,7 @@
   <p>
     The asynMotorController base class has methods that handle much of the work in writing
     a driver, including implementing the asyn interfaces and calling the appropriate
-    methods in the axis classes. A basic motor driver derived class will often only
+    methods in the axis classes. A basic motor driver derived class will often
     need to implement only the constructor for the controller class, and can just use
     the base class implementation of all other methods in the asynMotorController class.</p>
   <p>
