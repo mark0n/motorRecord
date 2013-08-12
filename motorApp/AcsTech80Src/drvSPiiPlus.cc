@@ -623,11 +623,11 @@ SPiiPlusConfig(int card,		/* card being configured */
 
     // Set controller command interface mode - BUFFER is the default 
     // Assure upper case argument - only check first 3 letters 
-    modeCas[0]= (char) NULL;
+    modeCas[0]= '\0';
     if (modeStr != NULL) {
       for (modeIdx=0; modeIdx < 3; modeIdx++)
 	modeCas[modeIdx] = toupper(modeStr[modeIdx]);
-      modeCas[3]= (char) NULL;				
+      modeCas[3]= '\0';				
     }
 				
     if (!strncmp(modeCas, DIRECT_STR,3))

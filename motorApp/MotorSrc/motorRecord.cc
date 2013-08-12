@@ -1937,7 +1937,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
                     command = HOME_REV;
 
                 WRITE_MSG(command, &hpos);
-                WRITE_MSG(GO, NULL);
+//                 WRITE_MSG(GO, NULL);
                 SEND_MSG();
 
                 pmr->dmov = FALSE;

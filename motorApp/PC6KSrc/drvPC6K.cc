@@ -839,7 +839,7 @@ static int motor_init()
 	    } while (!recvCnt && ++retryCnt < 3);
 
 
-	    /* send_mess(card_index, COMEXEC_ENA, (char) NULL); */   /* Enable continuous commands */
+	    /* send_mess(card_index, COMEXEC_ENA, NULL); */   /* Enable continuous commands */
 	    send_recv_mess(card_index, COMEXEC_ENA, buff);   /* Enable continuous commands */
 	    // send_recv_mess(card_index, CMD_SCALE, buff);     /* Enable scaling  - unary */
 

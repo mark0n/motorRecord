@@ -383,20 +383,20 @@ static int set_status(int card, int signal)
 
     if (MAXvdata.fwver[card] >= 1.33)
     {
-        /*send_mess(card, "#WS", (char) NULL); recv_mess(card, q_buf, 1);*/
-        send_recv_mess(card, "#WS", (char) NULL, q_buf, 1);
+        /*send_mess(card, "#WS", NULL); recv_mess(card, q_buf, 1);*/
+        send_recv_mess(card, "#WS", NULL, q_buf, 1);
         if (strcmp(q_buf, "=0") != 0)
         {
             errlogPrintf(wdctrmsg, card, q_buf);
 #if DISABLE_ON_WD_CTR
             status.Bits.RA_PROBLEM = 1;
             motor_info->status.All = status.All;
-            send_mess(card, STOP_ALL, (char) NULL);
+            send_mess(card, STOP_ALL, NULL);
             /* Disable board. */
             motor_state[card] = (struct controller *) NULL;
             return(rtn_state = 1); /* End move. */
 #else
-            send_mess(card, "#WC", (char) NULL);
+            send_mess(card, "#WC", NULL);
 #endif
         }
     }
@@ -532,7 +532,7 @@ static int set_status(int card, int signal)
 
                 /* Copy device directive to buffer. */
                 strncpy(buffer, nodeptr->postmsgptr, size);
-                buffer[size] = (char) NULL;
+                buffer[size] = NULL;
 
                 if (strncmp(buffer, "@PUT(", 5) != 0)
                     goto errorexit;
@@ -762,7 +762,7 @@ static int recv_mess(int card, char *com, int amount)
     }
 
     bufptr = com;
-    *bufptr = (char) NULL;
+    *bufptr = NULL;
 
     do
     {
@@ -849,7 +849,7 @@ static char *readbuf(volatile struct MAXv_motor *pmotor, char *bufptr)
         getIndex -= BUFFER_SIZE;
     
     bufptr += (bufsize - 1);
-    *bufptr = (char) NULL;
+    *bufptr = NULL;
 
     while (getIndex != pmotor->inPutIndex)
     {
@@ -1004,7 +1004,7 @@ MAXvSetup(int num_cards,        /* maximum number of cards in rack */
     for (itera = 0, strptr = &initstring[0]; itera < MAXv_num_cards; itera++, strptr++)
     {
         *strptr = (char *) malloc(INITSTR_SIZE);
-        **strptr = (char) NULL;
+        **strptr = NULL;
     }
 
     return(rtncode);
@@ -1231,11 +1231,11 @@ static int motor_init()
         pmotor->status1_irq_enable.All = 0;
         pmotor->status2_irq_enable = 0;
 
-       send_mess(card_index, ERROR_CLEAR, (char) NULL);
-       send_mess(card_index, STOP_ALL, (char) NULL);
+       send_mess(card_index, ERROR_CLEAR, NULL);
+       send_mess(card_index, STOP_ALL, NULL);
 
-        /* send_mess(card_index, GET_IDENT, (char) NULL); recv_mess(card_index, (char *) pmotorState->ident, 1);*/
-        send_recv_mess(card_index, GET_IDENT, (char) NULL, (char *) pmotorState->ident, 1);
+        /* send_mess(card_index, GET_IDENT, NULL); recv_mess(card_index, (char *) pmotorState->ident, 1);*/
+        send_recv_mess(card_index, GET_IDENT, NULL, (char *) pmotorState->ident, 1);
         Debug(3, "Identification = %s\n", pmotorState->ident);
 
         /* Save firmware version to static float array. */
@@ -1246,8 +1246,8 @@ static int motor_init()
 
         if (MAXvdata.fwver[card_index] >= 1.33)
         {
-            /* send_mess(card_index, "#WS", (char) NULL); recv_mess(card_index, axis_pos, 1);*/
-            send_recv_mess(card_index, "#WS", (char) NULL, axis_pos, 1);
+            /* send_mess(card_index, "#WS", NULL); recv_mess(card_index, axis_pos, 1);*/
+            send_recv_mess(card_index, "#WS", NULL, axis_pos, 1);
             if (strcmp(axis_pos, "=0") != 0)
             {
                 errlogPrintf(wdctrmsg, card_index, axis_pos);
@@ -1259,10 +1259,10 @@ static int motor_init()
 
             if (wdtrip == false)
         {
-            send_mess(card_index, initstring[card_index], (char) NULL);
+            send_mess(card_index, initstring[card_index], NULL);
     
-            /*send_mess(card_index, ALL_POS, (char) NULL); recv_mess(card_index, axis_pos, 1);*/
-            send_recv_mess(card_index, ALL_POS, (char) NULL, axis_pos, 1);
+            /*send_mess(card_index, ALL_POS, NULL); recv_mess(card_index, axis_pos, 1);*/
+            send_recv_mess(card_index, ALL_POS, NULL, axis_pos, 1);
     
             for (total_axis = 0, pos_ptr = epicsStrtok_r(axis_pos, ",", &tok_save);
                  pos_ptr; pos_ptr = epicsStrtok_r(NULL, ",", &tok_save), total_axis++)

@@ -374,7 +374,7 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
 	return(ERROR);
     }
 
-    local_buff[0] = (char) NULL;    /* Terminate local buffer. */
+    local_buff[0] = '\0';    /* Terminate local buffer. */
 
     if (name == NULL)
 	strcat(local_buff, com);    /* Make a local copy of the string. */
