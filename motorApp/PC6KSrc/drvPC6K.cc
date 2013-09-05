@@ -365,6 +365,7 @@ static int set_status(int card, int signal)
     status.Bits.RA_DIRECTION = (recvStr[TAS_NEG] == '0') ? 1 : 0;
 
     status.Bits.RA_HOME = home;
+    status.Bits.RA_HOMED = (recvStr[TAS_HOME] == '0') ? 0 : 1;
 
     plusdir = (status.Bits.RA_DIRECTION) ? true : false;
 
