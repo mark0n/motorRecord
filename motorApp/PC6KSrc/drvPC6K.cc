@@ -396,7 +396,7 @@ static int set_status(int card, int signal)
     /* encoder status */
     status.Bits.EA_SLIP 	= 0;
     status.Bits.EA_SLIP_STALL	= 0;
-    status.Bits.EA_HOME		= 0;
+    status.Bits.EA_HOME		= status.Bits.RA_HOME;
 
     /* 
      * Parse motor position
