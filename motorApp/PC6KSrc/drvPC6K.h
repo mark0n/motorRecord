@@ -111,6 +111,7 @@ struct PC6KController
 #define TAS_INMOTION   0    
 #define TAS_NEG        1
 #define TAS_HOME       4+1     /* Home Sucessfull */
+#define TAS_STALL      11+2    /* Stall detected */
 #define TAS_DRIVEDOWN  12+3    /* Drive Shutdown */
 #define TAS_DRIVEFAULT 13+3    /* Drive Fault Occurred */
 #define TAS_HPLUSTL    14+3    /* Hardware Plus Travel Limit */

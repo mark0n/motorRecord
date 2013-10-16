@@ -90,7 +90,7 @@ HeadURL:        $URL: https://subversion.xor.aps.anl.gov/synApps/motor/tags/R6-8
 /* Delay after START_MOTION before a status update is possible
  *   *** Limitation of Parker 6K  controller ***
 */
-#define MOTION_DELAY 0.05   
+#define MOTION_DELAY 0.05
 
 /*----------------debugging-----------------*/
 volatile int drvPC6Kdebug = 0;
@@ -133,7 +133,7 @@ static struct {
 
 static int nextSocket = 0;
 
-/* Pointer to the connection info for each socket 
+/* Pointer to the connection info for each socket
    the asynUser structure is defined in asynDriver.h */
 typedef struct {
     asynUser *pasynUser;
@@ -150,7 +150,7 @@ static socketStruct socketStructs[MAX_SOCKETS];
 static int recv_mess(int card, char *com, int flag);
 static RTN_STATUS send_mess(int card, char const *, char *name);
 static int send_recv_mess(int card, char const *send_com, char *recv_com);
-static int send_recv_mess(int card, char const *send_com, char *recv_com, 
+static int send_recv_mess(int card, char const *send_com, char *recv_com,
 			  char const *temp_eos);
 static int set_status(int card, int signal);
 static long report(int level);
@@ -218,8 +218,8 @@ static long report(int level)
 		struct PC6KController *cntrl;
 
 		cntrl = (struct PC6KController *) brdptr->DevicePrivate;
-	    	printf("    PC6K controller %d, port=%s, address=%d, id: %s \n", 
-			   card, cntrl->asyn_port, cntrl->asyn_address, 
+	    	printf("    PC6K controller %d, port=%s, address=%d, id: %s \n",
+			   card, cntrl->asyn_port, cntrl->asyn_address,
 			   brdptr->ident);
 	    }
 	}
@@ -230,7 +230,7 @@ static long report(int level)
 
 static long init()
 {
-   /* 
+   /*
     * We cannot call motor_init() here, because that function can do GPIB I/O,
     * and hence requires that the drvGPIB have already been initialized.
     * That cannot be guaranteed, so we need to call motor_init from device
@@ -289,7 +289,7 @@ static int set_status(int card, int signal)
 
   /* LOOP: send all status queries and check for valid response
   *    EXIT LOOP: if communication timeout or invalid response
-  *               but allow one retry; 
+  *               but allow one retry;
   */
   qindex = 0;
   recvRetry = recvNext = false;
@@ -313,7 +313,7 @@ static int set_status(int card, int signal)
 	}
     } while (recvRetry || recvNext);
 
-    
+
   /* Check for normal look termination - all queries successful */
   if (qindex >= QUERY_CNT)
     cntrl->status = NORMAL;
@@ -348,7 +348,7 @@ static int set_status(int card, int signal)
 
     nodeptr = motor_info->motor_motion;
 
-    /* 
+    /*
      * Parse the limit/status/fault strings
      */
     recvStr = strstrRtn[QLIM];
@@ -379,7 +379,7 @@ static int set_status(int card, int signal)
 	if (plusdir == true)
 	  ls_active = true;
       }
-    
+
     if (!negLimit)
       status.Bits.RA_MINUS_LS = 0;
     else
@@ -389,17 +389,16 @@ static int set_status(int card, int signal)
 	  ls_active = true;
       }
 
+    /* encoder status */
+    status.Bits.EA_SLIP 	= 0;
+    status.Bits.EA_SLIP_STALL	= (recvStr[TAS_STALL] == '1') ? 1 : 0;
+    status.Bits.EA_HOME		= status.Bits.RA_HOME;
 
     /* Position maintence enabled */
     recvStr = strstrRtn[QDRIVE];
-    status.Bits.EA_POSITION = (*recvStr == '1') ? 1: 0; 
+    status.Bits.EA_POSITION = (*recvStr == '0') ? 1 : 0;
 
-    /* encoder status */
-    status.Bits.EA_SLIP 	= 0;
-    status.Bits.EA_SLIP_STALL	= 0;
-    status.Bits.EA_HOME		= status.Bits.RA_HOME;
-
-    /* 
+    /*
      * Parse motor position
      */
     recvStr = strstrRtn[QPOS];
@@ -481,7 +480,7 @@ static int send_recv_mess(int card, char const *send_com, char *recv_com,
     }
     else if (size == 0)	/* Normal exit on empty input message. */
 	return(OK);
-    
+
     if (!motor_state[card])
     {
 	errlogPrintf("drvPC6K.c:send_recv_mess() - invalid card #%d\n", card);
@@ -496,10 +495,10 @@ static int send_recv_mess(int card, char const *send_com, char *recv_com,
       pasynOctetSyncIO->setInputEos(cntrl->pasynUser,temp_eos,strlen(temp_eos));
 
     /* flush any junk at input port - should not be any data available */
-    // pasynOctetSyncIO->flush(cntrl->pasynUser); 
+    // pasynOctetSyncIO->flush(cntrl->pasynUser);
 
     /* Perform atomic write/read operation  */
-    status = pasynOctetSyncIO->writeRead(cntrl->pasynUser, send_com, strlen(send_com), 
+    status = pasynOctetSyncIO->writeRead(cntrl->pasynUser, send_com, strlen(send_com),
                                          recv_com, PC6K_MSG_SIZE,
                                          TIMEOUT, &nwrite, &nread, &eomReason);
 
@@ -537,7 +536,7 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
     }
     else if (size == 0)	/* Normal exit on empty input message. */
 	return(OK);
-    
+
     if (!motor_state[card])
     {
 	errlogPrintf("drvPC6K.c:send_mess() - invalid card #%d\n", card);
@@ -557,7 +556,7 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
     /* flush any junk at input port - should not be any data available */
     // pasynOctetSyncIO->flush(cntrl->pasynUser);
 
-    pasynOctetSyncIO->write(cntrl->pasynUser, com, strlen(com), 
+    pasynOctetSyncIO->write(cntrl->pasynUser, com, strlen(com),
                             TIMEOUT, &nwrite);
 
     return(OK);
@@ -632,7 +631,7 @@ PC6KSetup(int num_cards,	/* maximum number of controllers in system.  */
     else
 	targs.motor_scan_rate = SCAN_RATE;
 
-   /* 
+   /*
     * Allocate space for motor_state structures.  Note this must be done
     * before PC6KConfig is called, so it cannot be done in motor_init()
     * This means that we must allocate space for a card without knowing
@@ -726,7 +725,7 @@ PC6KUpLoad(int card,               /* Controller Number */
 	for (i = 0, lineLen = strlen(nextLine); i < lineLen; i++)
 	  if (!isprint(nextLine[i]))
 	    nextLine[i] = ' ';
-	
+
 	// recvCnt = send_recv_mess(card, nextLine, replyBuff, eos_ptr);
 	// recvCnt = send_recv_mess(card, nextLine, replyBuff);
 	send_mess(card, nextLine, (char *) NULL);
@@ -787,10 +786,10 @@ static int motor_init()
 	cntrl = (struct PC6KController *) brdptr->DevicePrivate;
 
 	/* Initialize communications channel */
-	success_rtn = pasynOctetSyncIO->connect(cntrl->asyn_port, 
+	success_rtn = pasynOctetSyncIO->connect(cntrl->asyn_port,
                                             cntrl->asyn_address, &cntrl->pasynUser, NULL);
-	if (success_rtn != asynSuccess) 
-	      printf("drvPC68K:motor_init(), error calling pasynOctetSyncIO->connect port=%s error=%d\n", 
+	if (success_rtn != asynSuccess)
+	      printf("drvPC68K:motor_init(), error calling pasynOctetSyncIO->connect port=%s error=%d\n",
 		     cntrl->asyn_port, success_rtn);
 	else
 	{
@@ -805,7 +804,7 @@ static int motor_init()
 					  PC6K_IN_EOS,strlen(PC6K_IN_EOS));
             pasynOctetSyncIO->setOutputEos(cntrl->pasynUser,
 					   PC6K_OUT_EOS,strlen(PC6K_OUT_EOS));
-	    
+
 	    /* Send a message to the board, see if it exists */
 	    retryCnt = 0;
 
@@ -821,7 +820,7 @@ static int motor_init()
 
 	if (cardFound)
 	{
-	
+
 	    strcpy(brdptr->ident, buff);  /* Save Controller ID  */
 
 	    send_recv_mess(card_index, CMD_ECHO, buff);       /* Turn off echo */
@@ -829,14 +828,14 @@ static int motor_init()
 	    brdptr->localaddr = (char *) NULL;
 	    brdptr->motor_in_motion = 0;
 	    /* Stop all motors */
-	    send_recv_mess(card_index, STOP_ALL, buff);   
+	    send_recv_mess(card_index, STOP_ALL, buff);
             // All stop requires a delay before the controller starts responding
-	    //   again - handshake on some command 
+	    //   again - handshake on some command
 	    retryCnt = 0;
 	    do {
-	      recvCnt = send_recv_mess(card_index, CMD_DRIVE, buff); 
+	      recvCnt = send_recv_mess(card_index, CMD_DRIVE, buff);
               if (recvCnt && !strstr(buff, CMD_DRIVE))
-			recvCnt = 0;	                  
+			recvCnt = 0;
 	    } while (!recvCnt && ++retryCnt < 3);
 
 
@@ -846,12 +845,12 @@ static int motor_init()
 
 	    /* The find how many axes this controller has */
             total_axis = 0;
-	    
+
 	    do {
 	      brdptr->motor_info[total_axis].motor_motion = NULL;
 
 	      sprintf(send_buff, "%d%s", total_axis+1, CMD_POS);
-	      recvCnt = send_recv_mess(card_index, send_buff, buff);              
+	      recvCnt = send_recv_mess(card_index, send_buff, buff);
 	      nextAxis = (recvCnt > 0 && (buff[0] == REPLY_CHAR)) ? true : false;
 	      if (nextAxis)
 		  total_axis++;
@@ -882,17 +881,17 @@ static int motor_init()
 		// sprintf(send_buff, "%d%s", motor_index+1, CMD_SCLV);
 		// send_recv_mess(card_index, send_buff, buff);
 		// sprintf(send_buff, "%d%s", motor_index+1, CMD_SCLA);
-		// send_recv_mess(card_index, send_buff, buff);		
+		// send_recv_mess(card_index, send_buff, buff);
 
                 /* Determine if motor type = servo  */
                 sprintf(send_buff, "%d%s", motor_index+1, CMD_AXSDEF);
-       	        if (send_recv_mess(card_index, send_buff, buff) > 0 && 
+       	        if (send_recv_mess(card_index, send_buff, buff) > 0 &&
 		    (buff[0] == REPLY_CHAR) &&
 		    (buff[strlen(send_buff)+1] == '1'))
 		    cntrl->type[motor_index] =  DC;
 		else
 		    cntrl->type[motor_index] = STEPPER;
-		
+
 
 		/* Determin drive resolution */
 		if (cntrl->type[motor_index] ==  DC)
@@ -902,7 +901,7 @@ static int motor_init()
 
        	        if (send_recv_mess(card_index, send_buff, buff) > 0 && (buff[0] == REPLY_CHAR))
 		  cntrl->drive_resolution[motor_index] = 1.0 / atof(&buff[strlen(send_buff)+1]);
-		
+
 		digits = (int) -log10(cntrl->drive_resolution[motor_index]) + 2;
 		if (digits < 1)
 		  digits = 1;
@@ -935,7 +934,7 @@ static int motor_init()
     free_list.tail = (struct mess_node *) NULL;
 
     // epicsThreadCreate((char *) "PC6K_motor", 64, 5000, (EPICSTHREADFUNC) motor_task, (void *) &targs);
-    epicsThreadCreate((char *) "PC6K_motor", 
+    epicsThreadCreate((char *) "PC6K_motor",
                       epicsThreadPriorityMedium,
                       epicsThreadGetStackSize(epicsThreadStackMedium),
                       (EPICSTHREADFUNC) motor_task, (void *) &targs);
